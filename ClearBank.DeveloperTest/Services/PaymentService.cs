@@ -1,28 +1,24 @@
-﻿using ClearBank.DeveloperTest.Data;
+﻿using ClearBank.DeveloperTest.Data.Interfaces;
+using ClearBank.DeveloperTest.Services.Interfaces;
 using ClearBank.DeveloperTest.Types;
-using System.Configuration;
 
 namespace ClearBank.DeveloperTest.Services
 {
     public class PaymentService : IPaymentService
     {
+        private IAccountDataStoreFactory _accountDataStoreFactory;
+
+        public PaymentService(IAccountDataStoreFactory accountDataStoreFactory)
+        {
+            _accountDataStoreFactory = accountDataStoreFactory;
+        }
+
         public MakePaymentResult MakePayment(MakePaymentRequest request)
         {
-            var dataStoreType = ConfigurationManager.AppSettings["DataStoreType"];
+            var accountDataStore = _accountDataStoreFactory.GetAccountDataStore();
+            var account = accountDataStore.GetAccount(request.DebtorAccountNumber);
 
-            Account account = null;
-
-            if (dataStoreType == "Backup")
-            {
-                var accountDataStore = new BackupAccountDataStore();
-                account = accountDataStore.GetAccount(request.DebtorAccountNumber);
-            }
-            else
-            {
-                var accountDataStore = new AccountDataStore();
-                account = accountDataStore.GetAccount(request.DebtorAccountNumber);
-            }
-
+            // TODO: refactor from here
             var result = new MakePaymentResult();
 
             result.Success = true;
@@ -74,17 +70,7 @@ namespace ClearBank.DeveloperTest.Services
             if (result.Success)
             {
                 account.Balance -= request.Amount;
-
-                if (dataStoreType == "Backup")
-                {
-                    var accountDataStore = new BackupAccountDataStore();
-                    accountDataStore.UpdateAccount(account);
-                }
-                else
-                {
-                    var accountDataStore = new AccountDataStore();
-                    accountDataStore.UpdateAccount(account);
-                }
+                accountDataStore.UpdateAccount(account);
             }
 
             return result;
