@@ -1,7 +1,6 @@
-﻿namespace ClearBank.DeveloperTest.Data.Interfaces
+﻿namespace ClearBank.DeveloperTest.Data.Interfaces;
+
+public interface IConfigurationManager
 {
-    public interface IConfigurationManager
-    {
-        string GetAppSetting(string key);
-    }
+    string GetAppSetting(string key);
 }

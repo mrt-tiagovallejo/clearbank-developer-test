@@ -1,13 +1,12 @@
 ﻿using ClearBank.DeveloperTest.Data.Interfaces;
 using System.Configuration;
 
-namespace ClearBank.DeveloperTest.Data
+namespace ClearBank.DeveloperTest.Data;
+
+public class ConfigurationManagerAdapter : IConfigurationManager
 {
-    public class ConfigurationManagerAdapter : IConfigurationManager
+    public string GetAppSetting(string key)
     {
-        public string GetAppSetting(string key)
-        {
-            return ConfigurationManager.AppSettings[key];
-        }
+        return ConfigurationManager.AppSettings[key];
     }
 }

@@ -1,28 +1,25 @@
 ﻿using ClearBank.DeveloperTest.Data.Interfaces;
-using System.Configuration;
+using ClearBank.DeveloperTest.Types;
 
-namespace ClearBank.DeveloperTest.Data
+namespace ClearBank.DeveloperTest.Data;
+
+public class AccountDataStoreFactory : IAccountDataStoreFactory
 {
-    public class AccountDataStoreFactory : IAccountDataStoreFactory
+    private IConfigurationManager _configurationManager;
+
+    public AccountDataStoreFactory(IConfigurationManager configurationManager)
     {
-        private IConfigurationManager _configurationManager;
+        _configurationManager = configurationManager;
+    }
 
-        public AccountDataStoreFactory(IConfigurationManager configurationManager)
+    public IAccountDataStore GetAccountDataStore()
+    {
+        var dataStoreType = _configurationManager.GetAppSetting(nameof(AppSettings.DataStoreType));
+
+        return dataStoreType switch
         {
-            _configurationManager = configurationManager;
-        }
-
-        public IAccountDataStore GetAccountDataStore()
-        {
-            // TODO: move hardcoded string somewhere
-            var dataStoreType = _configurationManager.GetAppSetting("DataStoreType");
-
-            return dataStoreType switch
-            {
-                // TODO: enum this instead of hardcoded data store types
-                "Backup" => new BackupAccountDataStore(),
-                _ => new AccountDataStore()
-            };
-        }
+            nameof(DataStoryTypes.Backup) => new BackupAccountDataStore(),
+            _ => new AccountDataStore()
+        };
     }
 }
